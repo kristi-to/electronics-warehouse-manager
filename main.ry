@@ -1,0 +1,48 @@
+from logic import Warehouse
+
+def show_menu():
+    print("\n--- СИСТЕМА СКЛАДА ЭЛЕКТРОНИКИ ---")
+    print("1. Добавить товар")
+    print("2. Списать товар")
+    print("3. Показать всё")
+    print("4. Поиск по категории")
+    print("5. Общая стоимость")
+    print("0. Выход")
+
+def main():
+    wh = Warehouse()
+    # Тестовые данные
+    wh.add_item("E01", "iPhone 15", "Смартфоны", 85000, 10)
+    wh.add_item("E02", "MacBook Air", "Ноутбуки", 110000, 5)
+
+    while True:
+        show_menu()
+        choice = input("Выберите действие: ")
+        if choice == "1":
+            try:
+                art = input("Артикул: ")
+                name = input("Название: ")
+                cat = input("Категория: ")
+                prc = float(input("Цена: "))
+                qty = int(input("Количество: "))
+                print(wh.add_item(art, name, cat, prc, qty))
+            except ValueError:
+                print("Ошибка: введите числа в поля цены и количества.")
+        elif choice == "2":
+            art = input("Артикул: ")
+            qty = int(input("Количество: "))
+            print(wh.remove_item(art, qty))
+        elif choice == "3":
+            for item in wh.storage.values(): print(item)
+        elif choice == "4":
+            cat = input("Категория: ")
+            res = wh.filter_by_category(cat)
+            for r in res: print(r)
+        elif choice == "5":
+            print(f"Итого стоимость склада: {wh.get_total_report():,.2f} руб.")
+        elif choice == "0":
+            print("Выход из системы.")
+            break
+
+if __name__ == "__main__":
+    main()
