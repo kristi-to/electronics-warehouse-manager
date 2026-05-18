@@ -1,0 +1,28 @@
+from models import Product
+
+class Warehouse:
+    def __init__(self):
+        self.storage = {}
+
+    def add_item(self, article, name, category, price, quantity):
+        if article in self.storage:
+            self.storage[article].quantity += int(quantity)
+            return f"Количество товара '{name}' обновлено."
+        else:
+            new_item = Product(article, name, category, price, quantity)
+            self.storage[article] = new_item
+            return f"Товар '{name}' добавлен."
+
+    def remove_item(self, article, amount):
+        if article in self.storage:
+            if self.storage[article].quantity >= amount:
+                self.storage[article].quantity -= amount
+                return f"Списано {amount} шт."
+            return "Ошибка: Недостаточно товара на складе."
+        return "Ошибка: Товар не найден."
+
+    def get_total_report(self):
+        return sum(item.price * item.quantity for item in self.storage.values())
+
+    def filter_by_category(self, category):
+        return [item for item in self.storage.values() if item.category.lower() == category.lower()]
