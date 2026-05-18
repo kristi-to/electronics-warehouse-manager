@@ -1,0 +1,10 @@
+class Product:
+    def __init__(self, article, name, category, price, quantity):
+        self.article = article
+        self.name = name
+        self.category = category
+        self.price = float(price)
+        self.quantity = int(quantity)
+
+    def __str__(self):
+        return f"Арт: {self.article} | {self.name:15} | Кат: {self.category:12} | Цена: {self.price:>8} | Кол-во: {self.quantity}"
