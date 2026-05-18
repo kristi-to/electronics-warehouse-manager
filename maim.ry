@@ -1,0 +1,115 @@
+"""
+Проект: Система управления складом электроники
+Автор: Тайкова К.Д.
+Описание: Консольное приложение для учета товаров, списания и генерации отчетов.
+"""
+
+class Product:
+    """Класс описывает сущность товара на складе."""
+    def __init__(self, article, name, category, price, quantity):
+        self.article = article      # Уникальный артикул
+        self.name = name            # Наименование товара
+        self.category = category    # Категория (смартфоны, ноутбуки и т.д.)
+        self.price = float(price)   # Стоимость за единицу
+        self.quantity = int(quantity) # Количество на складе
+
+    def __str__(self):
+        return f"Арт: {self.article} | {self.name:15} | Кат: {self.category:12} | Цена: {self.price:>8} | Кол-во: {self.quantity}"
+
+class Warehouse:
+    """Класс отвечает за логику хранения и обработки данных склада."""
+    def __init__(self):
+        # Используем словарь для хранения: ключ - артикул, значение - объект Product
+        self.storage = {}
+
+    def add_item(self, article, name, category, price, quantity):
+        """Добавляет новый товар или увеличивает остаток существующего."""
+        if article in self.storage:
+            self.storage[article].quantity += int(quantity)
+            return f"Количество товара '{name}' успешно увеличено."
+        else:
+            new_item = Product(article, name, category, price, quantity)
+            self.storage[article] = new_item
+            return f"Товар '{name}' добавлен в систему."
+
+    def remove_item(self, article, amount):
+        """Реализует логику списания (продажи) товара."""
+        if article in self.storage:
+            if self.storage[article].quantity >= amount:
+                self.storage[article].quantity -= amount
+                return f"Списано {amount} шт. Остаток: {self.storage[article].quantity}"
+            return "Ошибка: Недостаточно товара на складе!"
+        return "Ошибка: Товар не найден."
+
+    def get_total_report(self):
+        """Вычисляет общую стоимость всех товаров на складе."""
+        return sum(item.price * item.quantity for item in self.storage.values())
+
+    def filter_by_category(self, category):
+        """Возвращает список товаров выбранной категории."""
+        return [item for item in self.storage.values() if item.category.lower() == category.lower()]
+
+# --- Функции интерфейса (отделение логики от вывода) ---
+
+def show_main_menu():
+    print("\n" + "="*50)
+    print("   СИСТЕМА СКЛАДСКОГО УЧЕТА (ЭЛЕКТРОНИКА)")
+    print("="*50)
+    print("1. Приход товара (Добавить)")
+    print("2. Расход товара (Списать/Продать)")
+    print("3. Инвентаризация (Показать всё)")
+    print("4. Поиск по категории")
+    print("5. Финансовый отчет (Общая стоимость)")
+    print("0. Выход из программы")
+
+def main():
+    """Основная управляющая функция."""
+    wh = Warehouse()
+    
+    # Демонстрационные данные
+    wh.add_item("E001", "iPhone 15", "Смартфоны", 85000, 10)
+    wh.add_item("E002", "MacBook Air", "Ноутбуки", 110000, 5)
+    wh.add_item("E003", "Xiaomi 13", "Смартфоны", 45000, 20)
+
+    while True:
+        show_main_menu()
+        choice = input("\nВыберите действие (0-5): ")
+
+        if choice == "1":
+            art = input("Введите артикул: ")
+            name = input("Название: ")
+            cat = input("Категория: ")
+            prc = input("Цена: ")
+            qty = input("Количество: ")
+            print(wh.add_item(art, name, cat, prc, qty))
+
+        elif choice == "2":
+            art = input("Артикул для списания: ")
+            amt = int(input("Количество единиц: "))
+            print(wh.remove_item(art, amt))
+
+        elif choice == "3":
+            print("\nСПИСОК ТОВАРОВ НА СКЛАДЕ:")
+            for item in wh.storage.values():
+                print(item)
+
+        elif choice == "4":
+            cat = input("Какую категорию искать?: ")
+            results = wh.filter_by_category(cat)
+            if results:
+                for r in results: print(r)
+            else:
+                print("Ничего не найдено.")
+        elif choice == "5":
+            total = wh.get_total_report()
+            print(f"\nОБЩАЯ СТОИМОСТЬ СКЛАДА: {total:,.2f} руб.")
+
+        elif choice == "0":
+            print("Программа закрыта. До свидания!")
+            break
+        else:
+            print("Ошибка: Выберите пункт от 0 до 5.")
+
+if __name__ == "__main__":
+    main()
+
